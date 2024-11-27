@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
@@ -12,24 +11,40 @@ export default function PaymentMethod() {
   const [showApiKey, setShowApiKey] = useState(false)
 
   return (
-    <div className="space-y-2">
-      <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Payment Method</h3>
-      <RadioGroup value={paymentMethod} onValueChange={setPaymentMethod}>
+    <div className="space-y-4">
+      <h3 className="text-sm font-medium leading-none mb-3">Payment Method</h3>
+      <div className="space-y-2">
         <div className="flex items-center space-x-2">
-          <RadioGroupItem value="credits" id="credits" />
+          <input 
+            type="radio" 
+            id="credits" 
+            name="payment" 
+            value="credits"
+            checked={paymentMethod === 'credits'}
+            onChange={(e) => setPaymentMethod(e.target.value)}
+            className="w-4 h-4"
+          />
           <Label htmlFor="credits">Credits (requires login)</Label>
         </div>
         <div className="flex items-center space-x-2">
-          <RadioGroupItem value="api-key" id="api-key" />
+          <input 
+            type="radio" 
+            id="api-key" 
+            name="payment" 
+            value="api-key"
+            checked={paymentMethod === 'api-key'}
+            onChange={(e) => setPaymentMethod(e.target.value)}
+            className="w-4 h-4"
+          />
           <Label htmlFor="api-key">API Key</Label>
         </div>
-      </RadioGroup>
+      </div>
       {paymentMethod === 'api-key' && (
         <div className="flex space-x-2 mt-2">
           <Input
             type={showApiKey ? 'text' : 'password'}
             placeholder="Enter your API key"
-            className="flex-grow bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+            className="flex-grow"
           />
           <Button
             variant="outline"
