@@ -1,25 +1,35 @@
+// Copyright 2024 Kakusui LLC (https://kakusui.org) (https://github.com/Kakusui) (https://github.com/Kakusui/EasyTL-Frontend)
+// Use of this source code is governed by an GNU Affero General Public License v3.0
+// license that can be found in the LICENSE file.
+
+// maintain allman bracket style for consistency
+
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { ArrowUpDownIcon, DownloadIcon, CopyIcon, XIcon, CheckIcon } from 'lucide-react'
 
-interface TranslatedOutputProps {
+interface TranslatedOutputProps 
+{
   text: string;
   onSwap: () => void;
   onClose: () => void;
 }
 
-export default function TranslatedOutput({ text, onSwap, onClose }: TranslatedOutputProps) {
+export default function TranslatedOutput({ text, onSwap, onClose }: TranslatedOutputProps) 
+{
   const [copyIcon, setCopyIcon] = useState(<CopyIcon className="h-4 w-4" />)
   const [downloadIcon, setDownloadIcon] = useState(<DownloadIcon className="h-4 w-4" />)
 
-  const handleCopy = () => {
+  const handleCopy = () => 
+  {
     navigator.clipboard.writeText(text)
     setCopyIcon(<CheckIcon className="h-4 w-4" />)
     setTimeout(() => setCopyIcon(<CopyIcon className="h-4 w-4" />), 1000)
   }
 
-  const handleDownload = () => {
+  const handleDownload = () => 
+  {
     const blob = new Blob([text], { type: 'text/plain' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
@@ -60,4 +70,3 @@ export default function TranslatedOutput({ text, onSwap, onClose }: TranslatedOu
     </div>
   )
 }
-

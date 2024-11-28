@@ -1,12 +1,18 @@
-const Terms = () => {
+// Copyright 2024 Kakusui LLC (https://kakusui.org) (https://github.com/Kakusui) (https://github.com/Kakusui/EasyTL-Frontend)
+// Use of this source code is governed by an GNU Affero General Public License v3.0
+// license that can be found in the LICENSE file.
+
+// maintain allman bracket style for consistency
+
+const Terms = () => 
+{
   return (
     <div className="min-h-screen w-screen bg-gray-100 dark:bg-gray-900 p-8">
       <div className="max-w-3xl mx-auto prose dark:prose-invert">
         <h1>Terms of Service</h1>
-        {/* Add your terms of service content here */}
       </div>
     </div>
   );
-};
+}
 
 export default Terms; 

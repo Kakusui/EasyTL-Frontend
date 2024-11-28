@@ -1,7 +1,14 @@
+// Copyright 2024 Kakusui LLC (https://kakusui.org) (https://github.com/Kakusui) (https://github.com/Kakusui/EasyTL-Frontend)
+// Use of this source code is governed by an GNU Affero General Public License v3.0
+// license that can be found in the LICENSE file.
+
+// maintain allman bracket style for consistency
+
 import { useState } from 'react'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 
-export default function LLMSettings() {
+export default function LLMSettings() 
+{
   const [selectedLLM, setSelectedLLM] = useState('')
 
   return (
@@ -44,4 +51,3 @@ export default function LLMSettings() {
     </div>
   )
 }
-

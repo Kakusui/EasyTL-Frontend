@@ -1,3 +1,9 @@
+// Copyright 2024 Kakusui LLC (https://kakusui.org) (https://github.com/Kakusui) (https://github.com/Kakusui/EasyTL-Frontend)
+// Use of this source code is governed by an GNU Affero General Public License v3.0
+// license that can be found in the LICENSE file.
+
+// maintain allman bracket style for consistency
+
 'use client'
 
 import { useState } from 'react'
@@ -15,7 +21,9 @@ import TranslatedOutput from './TranslatedOutput'
 import { useAuth } from '@/contexts/AuthContext'
 import { LoginDialog } from './LoginDialog'
 
-export default function TranslationInterface() {
+export default function TranslationInterface()
+{
+
   const [inputText, setInputText] = useState('')
   const [outputText, setOutputText] = useState('')
   const [isLoading, setIsLoading] = useState(false)
@@ -24,7 +32,8 @@ export default function TranslationInterface() {
   const { isLoggedIn, logout } = useAuth()
   const { theme, setTheme } = useTheme()
 
-  const handleSubmit = async () => {
+  const handleSubmit = async () => 
+  {
     setIsLoading(true)
     // Simulating API call
     await new Promise(resolve => setTimeout(resolve, 2000))
@@ -32,12 +41,14 @@ export default function TranslationInterface() {
     setIsLoading(false)
   }
 
-  const handleSwap = () => {
+  const handleSwap = () => 
+  {
     setInputText(outputText)
     setOutputText(inputText)
   }
 
-  const handleCloseOutput = () => {
+  const handleCloseOutput = () => 
+  {
     setOutputText('')
   }
 

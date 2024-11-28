@@ -1,3 +1,9 @@
+// Copyright 2024 Kakusui LLC (https://kakusui.org) (https://github.com/Kakusui) (https://github.com/Kakusui/EasyTL-Frontend)
+// Use of this source code is governed by an GNU Affero General Public License v3.0
+// license that can be found in the LICENSE file.
+
+// maintain allman bracket style for consistency
+
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { useAuth } from '@/contexts/AuthContext'
 import { GoogleLogin } from '@react-oauth/google'
@@ -10,12 +16,15 @@ export function LoginDialog({
 }: {
   open: boolean
   onOpenChange: (open: boolean) => void
-}) {
+}) 
+{
   const { login, isLoggedIn, userEmail, credits } = useAuth()
   const { toast } = useToast()
 
-  const handleGoogleLogin = async (credentialResponse: any) => {
-    try {
+  const handleGoogleLogin = async (credentialResponse: any) => 
+  {
+    try 
+    {
       const response = await fetch(getURL('/auth/google-login'), {
         method: 'POST',
         headers: {
@@ -25,9 +34,11 @@ export function LoginDialog({
         credentials: 'include'
       })
 
-      if (response.ok) {
+      if(response.ok) 
+      {
         const data = await response.json()
-        if (data.access_token) {
+        if(data.access_token) 
+        {
           await login(data.access_token)
           onOpenChange(false)
           toast({
@@ -35,14 +46,18 @@ export function LoginDialog({
             description: "You have been logged in successfully"
           })
         }
-      } else {
+      } 
+      else 
+      {
         toast({
           variant: "destructive",
           title: "Google login failed",
           description: "Unable to login with Google. Please try again."
         })
       }
-    } catch (error) {
+    } 
+    catch (error) 
+    {
       toast({
         variant: "destructive",
         title: "Error",
@@ -52,7 +67,8 @@ export function LoginDialog({
     }
   }
 
-  if (isLoggedIn) {
+  if(isLoggedIn) 
+  {
     return (
       <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent className="w-[90vw] max-w-[400px] bg-background border-border">

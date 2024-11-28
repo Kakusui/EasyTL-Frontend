@@ -1,3 +1,9 @@
+// Copyright 2024 Kakusui LLC (https://kakusui.org) (https://github.com/Kakusui) (https://github.com/Kakusui/EasyTL-Frontend)
+// Use of this source code is governed by an GNU Affero General Public License v3.0
+// license that can be found in the LICENSE file.
+
+// maintain allman bracket style for consistency
+
 'use client'
 
 import { useState, useEffect } from 'react'
@@ -5,32 +11,39 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 
-interface LanguageInputProps {
+interface LanguageInputProps 
+{
   detectedLanguage: string;
   setDetectedLanguage: (language: string) => void;
 }
 
-export default function LanguageInput({ detectedLanguage, setDetectedLanguage }: LanguageInputProps) {
+export default function LanguageInput({ detectedLanguage, setDetectedLanguage }: LanguageInputProps) 
+{
   const [isDetecting, setIsDetecting] = useState(false)
   const [customLanguage, setCustomLanguage] = useState('')
 
-  const handleDetect = () => {
+  const handleDetect = () => 
+  {
     setIsDetecting(true)
     // Simulating language detection
-    setTimeout(() => {
+    setTimeout(() => 
+    {
       setDetectedLanguage('')
       setCustomLanguage('Custom Language')
       setIsDetecting(false)
     }, 1000)
   }
 
-  const handleLanguageSelect = (value: string) => {
+  const handleLanguageSelect = (value: string) => 
+  {
     setDetectedLanguage(value)
     setCustomLanguage('')
   }
 
-  useEffect(() => {
-    if (customLanguage) {
+  useEffect(() => 
+  {
+    if(customLanguage) 
+    {
       setDetectedLanguage('')
     }
   }, [customLanguage, setDetectedLanguage])
@@ -63,4 +76,3 @@ export default function LanguageInput({ detectedLanguage, setDetectedLanguage }:
     </div>
   )
 }
-

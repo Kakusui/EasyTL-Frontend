@@ -1,3 +1,9 @@
+// Copyright 2024 Kakusui LLC (https://kakusui.org) (https://github.com/Kakusui) (https://github.com/Kakusui/EasyTL-Frontend)
+// Use of this source code is governed by an GNU Affero General Public License v3.0
+// license that can be found in the LICENSE file.
+
+// maintain allman bracket style for consistency
+
 'use client'
 
 import { useState } from 'react'
@@ -6,7 +12,8 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { EyeIcon, EyeOffIcon } from 'lucide-react'
 
-export default function PaymentMethod() {
+export default function PaymentMethod() 
+{
   const [paymentMethod, setPaymentMethod] = useState('credits')
   const [showApiKey, setShowApiKey] = useState(false)
 
@@ -58,4 +65,3 @@ export default function PaymentMethod() {
     </div>
   )
 }
-

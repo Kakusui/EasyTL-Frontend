@@ -1,13 +1,22 @@
+// Copyright 2024 Kakusui LLC (https://kakusui.org) (https://github.com/Kakusui) (https://github.com/Kakusui/EasyTL-Frontend)
+// Use of this source code is governed by an GNU Affero General Public License v3.0
+// license that can be found in the LICENSE file.
+
+// maintain allman bracket style for consistency
+
 import { Textarea } from '@/components/ui/textarea'
 import { Button } from '@/components/ui/button'
 
-interface TextInputProps {
+interface TextInputProps 
+{
   value: string;
   onChange: (value: string) => void;
 }
 
-export default function TextInput({ value, onChange }: TextInputProps) {
-  const handlePaste = async () => {
+export default function TextInput({ value, onChange }: TextInputProps) 
+{
+  const handlePaste = async () => 
+  {
     const text = await navigator.clipboard.readText()
     onChange(text)
   }

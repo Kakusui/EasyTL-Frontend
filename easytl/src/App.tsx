@@ -1,3 +1,9 @@
+// Copyright 2024 Kakusui LLC (https://kakusui.org) (https://github.com/Kakusui) (https://github.com/Kakusui/EasyTL-Frontend)
+// Use of this source code is governed by an GNU Affero General Public License v3.0
+// license that can be found in the LICENSE file.
+
+// maintain allman bracket style for consistency
+
 import { useState, useEffect } from 'react'
 import { ThemeProvider } from 'next-themes'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
@@ -8,23 +14,29 @@ import Footer from '@/components/Footer'
 import Terms from '@/pages/Terms'
 import Privacy from '@/pages/Privacy'
 
-const MainLayout = () => (
-  <main className="min-h-screen w-screen bg-gray-100 dark:bg-gray-900 flex items-center justify-center relative">
-    <div className="w-[800px] max-w-[90vw] p-6">
-      <TranslationInterface />
-    </div>
-    <Footer />
-  </main>
-);
+const MainLayout = () =>
+{
+  return (
+    <main className="min-h-screen w-screen bg-gray-100 dark:bg-gray-900 flex items-center justify-center relative">
+      <div className="w-[800px] max-w-[90vw] p-6">
+        <TranslationInterface />
+      </div>
+      <Footer />
+    </main>
+  );
+}
 
-export default function App() {
+export default function App()
+{
   const [mounted, setMounted] = useState(false)
 
-  useEffect(() => {
+  useEffect(() => 
+  {
     setMounted(true)
   }, [])
 
-  if (!mounted) {
+  if (!mounted) 
+  {
     return null
   }
 
@@ -44,4 +56,3 @@ export default function App() {
     </GoogleOAuthProvider>
   )
 }
-

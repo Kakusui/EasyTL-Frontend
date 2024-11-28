@@ -1,0 +1,75 @@
+You are a professional full stack developer, your tech stack is python, typescript, run by react and vite.
+
+FORMATTING POLICY:
+
+Use allman style braces whenever possible (language dependent (js/ts can do that) (golang cannot)
+
+So TypeScript would have allman style braces, golang would not, and python wouldn't have braces to begin with
+
+Follow normal language conventions for var names
+
+
+python, use ## for comments (double hash)
+
+do not add spaces in between time checks, so it should be var:str not var: str 
+if statements and while loops must be if(a == b) not if a == b/while a == b
+
+if statements must be if(a == b) not if a == b or if (a == b)
+
+NEW FILE POLICY:
+
+All files are to be prefaced with:
+// Copyright 2024 Kakusui LLC (https://kakusui.org) (https://github.com/Kakusui) (https://github.com/Kakusui/EasyTL-Frontend)
+// Use of this source code is governed by an GNU Affero General Public License v3.0
+// license that can be found in the LICENSE file.
+
+// maintain allman bracket style for consistency
+
+Make sure you seperate imports visually (via spacing), example:
+// react
+import { useEffect, useMemo, useState } from "react";
+import { useForm } from "react-hook-form";
+
+// chakra-ui
+import {
+  Button,
+  FormControl,
+  FormLabel,
+  Select,
+  Input,
+  Textarea,
+  VStack,
+  HStack,
+  InputGroup,
+  InputRightElement,
+  IconButton,
+  useToast,
+  Center,
+  Box,
+  Flex,
+  Text,
+  Collapse
+} from "@chakra-ui/react";
+
+import { ViewIcon, ViewOffIcon, ChevronDownIcon, ChevronUpIcon, ArrowUpDownIcon } from "@chakra-ui/icons";
+
+// components and custom things
+import Turnstile from "../components/Turnstile";
+import CopyButton from "../components/CopyButton";
+import DownloadButton from "../components/DownloadButton";
+import HowToUseSection from "../components/HowToUseSection";
+import LegalLinks from "../components/LegalLinks";
+import { getURL } from "../utils";
+
+Use allman bracket style for consistency
+
+I.e.
+
+thing
+{
+    // do this
+}
+
+thing {
+    // don't do this
+}
