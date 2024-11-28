@@ -1,4 +1,5 @@
 import React, { createContext, useState, useContext, useEffect, useCallback, useRef } from 'react';
+import { getURL } from '@/utils';
 
 interface AuthContextType {
     isLoggedIn: boolean;
@@ -47,7 +48,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
         const access_token = localStorage.getItem('access_token');
         try {
-            const response = await fetch('/user/info', {
+            const response = await fetch(getURL('/user/info'), {
                 headers: {
                     'Authorization': `Bearer ${access_token}`,
                 }
