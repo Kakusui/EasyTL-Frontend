@@ -12,12 +12,17 @@ import PaymentMethod from './PaymentMethod'
 import AdvancedSettings from './AdvancedSettings'
 import SubmitButton from './SubmitButton'
 import TranslatedOutput from './TranslatedOutput'
+import { useAuth } from '@/contexts/AuthContext'
+import { LoginDialog } from './LoginDialog'
 
 export default function TranslationInterface() {
   const [inputText, setInputText] = useState('')
   const [outputText, setOutputText] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [detectedLanguage, setDetectedLanguage] = useState('')
+  const [loginDialogOpen, setLoginDialogOpen] = useState(false)
+  const { isLoggedIn, logout } = useAuth()
+  const { theme, setTheme } = useTheme()
 
   const handleSubmit = async () => {
     setIsLoading(true)
@@ -36,43 +41,78 @@ export default function TranslationInterface() {
     setOutputText('')
   }
 
-  const { theme, setTheme } = useTheme()
-
   return (
-    <div className="bg-white dark:bg-gray-800 shadow-md rounded-lg overflow-hidden w-full">
-      <div className="flex justify-between items-center p-6">
-        <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-100">EasyTL</h1>
-        <div className="flex items-center space-x-2">
+    <div className="max-w-5xl mx-auto bg-background shadow-lg rounded-lg overflow-hidden">
+      {/* Header */}
+      <div className="px-6 py-4 border-b border-border flex justify-between items-center">
+        <h1 className="text-2xl font-bold text-foreground">EasyTL</h1>
+        <div className="flex items-center gap-2">
           <Button
             variant="ghost"
             size="icon"
             onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
             aria-label="Toggle theme"
+            className="text-foreground hover:bg-accent"
           >
             {theme === 'dark' ? <SunIcon className="h-5 w-5" /> : <MoonIcon className="h-5 w-5" />}
           </Button>
-          <Button variant="ghost" size="sm" className="flex items-center space-x-2">
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            className="flex items-center gap-2 text-foreground hover:bg-accent"
+            onClick={() => isLoggedIn ? logout() : setLoginDialogOpen(true)}
+          >
             <UserIcon className="h-5 w-5" />
-            <span>Login</span>
+            <span>{isLoggedIn ? 'Logout' : 'Login'}</span>
           </Button>
         </div>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-6">
-        <div className="space-y-4">
-          <LanguageInput detectedLanguage={detectedLanguage} setDetectedLanguage={setDetectedLanguage} />
-          <TextInput value={inputText} onChange={setInputText} />
-          <ToneSettings />
+
+      {/* Main Content */}
+      <div className="p-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Left Column */}
+          <div className="space-y-4">
+            <LanguageInput 
+              detectedLanguage={detectedLanguage} 
+              setDetectedLanguage={setDetectedLanguage} 
+            />
+            <TextInput 
+              value={inputText} 
+              onChange={setInputText} 
+            />
+            <ToneSettings />
+          </div>
+
+          {/* Right Column */}
+          <div className="space-y-4">
+            <LLMSettings />
+            <PaymentMethod />
+            <AdvancedSettings />
+            <SubmitButton 
+              onClick={handleSubmit} 
+              isLoading={isLoading} 
+            />
+          </div>
         </div>
-        <div className="space-y-4">
-          <LLMSettings />
-          <PaymentMethod />
-          <AdvancedSettings />
-          <SubmitButton onClick={handleSubmit} isLoading={isLoading} />
-        </div>
+
+        {/* Output Section */}
+        {outputText && (
+          <div className="mt-6">
+            <TranslatedOutput 
+              text={outputText} 
+              onSwap={handleSwap} 
+              onClose={handleCloseOutput} 
+            />
+          </div>
+        )}
       </div>
-      {outputText && (
-        <TranslatedOutput text={outputText} onSwap={handleSwap} onClose={handleCloseOutput} />
-      )}
+
+      {/* Login Dialog */}
+      <LoginDialog 
+        open={loginDialogOpen} 
+        onOpenChange={setLoginDialogOpen}
+      />
     </div>
   )
 }
