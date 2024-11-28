@@ -1,13 +1,40 @@
+<!--
+Copyright 2024 Kakusui LLC (https://kakusui.org) (https://github.com/Kakusui) (https://github.com/Kakusui/EasyTL-Frontend)
+Use of this source code is governed by an GNU Affero General Public License v3.0
+license that can be found in the LICENSE file.
+
+maintain allman bracket style for consistency
+-->
+
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<head>
+    <meta charset="UTF-8"/>
+    <link href="/kakusui_logo.webp" rel="icon" type="image/webp"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta content="EasyTL is a simple and easy-to-use translation tool that uses AI to translate text between languages. It differs from other translation tools by focusing on simplicity, yet remaining highly customizable." name="description"/>
     <title>EasyTL</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+    <script>
+        // Frame busting JavaScript
+        if(top != self) top.location.replace(self.location.href);
+        
+        // Theme initialization
+        let theme = localStorage.getItem('theme') || 'dark';
+        document.documentElement.classList.add(theme);
+    </script>
+    <style>
+        html {
+            background-color: rgb(17 24 39); /* bg-gray-900 */
+        }
+        html.light {
+            background-color: rgb(243 244 246); /* bg-gray-100 */
+        }
+    </style>
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <meta http-equiv="Content-Security-Policy" content="frame-ancestors 'none'">
+</head>
+<body>
+<div id="root"></div>
+<script src="/src/main.tsx" type="module"></script>
+</body>
 </html>
