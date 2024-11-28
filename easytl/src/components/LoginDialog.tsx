@@ -11,7 +11,7 @@ export function LoginDialog({
   open: boolean
   onOpenChange: (open: boolean) => void
 }) {
-  const { login } = useAuth()
+  const { login, isLoggedIn, userEmail, credits } = useAuth()
   const { toast } = useToast()
 
   const handleGoogleLogin = async (credentialResponse: any) => {
@@ -50,6 +50,29 @@ export function LoginDialog({
       })
       console.error('Error:', error)
     }
+  }
+
+  if (isLoggedIn) {
+    return (
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent className="w-[90vw] max-w-[400px] bg-background border-border">
+          <DialogHeader>
+            <DialogTitle className="text-foreground">Profile</DialogTitle>
+          </DialogHeader>
+          
+          <div className="py-4 space-y-4">
+            <div>
+              <label className="text-sm font-medium text-muted-foreground">Email</label>
+              <p className="text-foreground">{userEmail}</p>
+            </div>
+            <div>
+              <label className="text-sm font-medium text-muted-foreground">Credits</label>
+              <p className="text-foreground">{credits}</p>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+    )
   }
 
   return (

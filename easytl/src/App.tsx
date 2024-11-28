@@ -1,8 +1,21 @@
 import { useState, useEffect } from 'react'
 import { ThemeProvider } from 'next-themes'
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import TranslationInterface from '@/components/TranslationInterface'
 import { AuthProvider } from '@/contexts/AuthContext'
 import { GoogleOAuthProvider } from '@react-oauth/google'
+import Footer from '@/components/Footer'
+import Terms from '@/pages/Terms'
+import Privacy from '@/pages/Privacy'
+
+const MainLayout = () => (
+  <main className="min-h-screen w-screen bg-gray-100 dark:bg-gray-900 flex items-center justify-center relative">
+    <div className="w-[800px] max-w-[90vw] p-6">
+      <TranslationInterface />
+    </div>
+    <Footer />
+  </main>
+);
 
 export default function App() {
   const [mounted, setMounted] = useState(false)
@@ -19,11 +32,13 @@ export default function App() {
     <GoogleOAuthProvider clientId="951070461527-dhsteb0ro97qrq4d2e7cq2mr9ehichol.apps.googleusercontent.com">
       <AuthProvider>
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
-          <main className="min-h-screen w-screen bg-gray-100 dark:bg-gray-900 flex items-center justify-center relative">
-            <div className="w-[800px] max-w-[90vw] p-6">
-              <TranslationInterface />
-            </div>
-          </main>
+          <BrowserRouter>
+            <Routes>
+              <Route path="/" element={<MainLayout />} />
+              <Route path="/terms" element={<Terms />} />
+              <Route path="/privacy" element={<Privacy />} />
+            </Routes>
+          </BrowserRouter>
         </ThemeProvider>
       </AuthProvider>
     </GoogleOAuthProvider>
