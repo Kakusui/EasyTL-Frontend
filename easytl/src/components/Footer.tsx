@@ -11,17 +11,30 @@ const Footer = () =>
   return (
     <footer className="absolute bottom-0 left-0 w-full py-4 text-sm text-gray-500 dark:text-gray-400 text-center">
       <div className="flex flex-col gap-2">
-        <span>© Copyright 2024 Kakusui LLC</span>
+        <span>Made by <Link 
+          to="https://kakusui.org" 
+          target="_blank" 
+          rel="noopener noreferrer"
+          className="link-underline hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
+        >
+          Kakusui LLC
+        </Link> © Copyright 2024</span>
         <div className="flex justify-center items-center gap-4">
           <Link 
             to="/terms"
-            className="hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
+            className="link-underline hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
           >
             Terms of Service
           </Link>
-          <Link 
+          <Link
+            to="/about"
+            className="link-underline hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
+          >
+            About
+          </Link>
+          <Link
             to="/privacy"
-            className="hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
+            className="link-underline hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
           >
             Privacy Policy
           </Link>
