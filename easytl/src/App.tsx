@@ -13,7 +13,7 @@ import { GoogleOAuthProvider } from '@react-oauth/google'
 import Footer from '@/components/Footer'
 import Terms from '@/pages/Terms'
 import Privacy from '@/pages/Privacy'
-
+import About from '@/pages/About'
 const MainLayout = () =>
 {
   return (
@@ -49,6 +49,7 @@ export default function App()
               <Route path="/" element={<MainLayout />} />
               <Route path="/terms" element={<Terms />} />
               <Route path="/privacy" element={<Privacy />} />
+              <Route path="/about" element={<About />} />
             </Routes>
           </BrowserRouter>
         </ThemeProvider>
