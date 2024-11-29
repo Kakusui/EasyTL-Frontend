@@ -19,16 +19,16 @@ const Terms = () =>
   }, [])
 
   return (
-    <div className="min-h-screen w-screen bg-background p-8">
+    <div className="min-h-screen w-screen bg-background">
       <Button
         variant="ghost"
         size="icon"
-        className="fixed top-4 left-4 h-12 w-12"
+        className="fixed top-2 left-2 md:top-4 md:left-4 h-10 w-10 md:h-12 md:w-12 z-10"
         onClick={() => navigate('/')}
       >
-        <ArrowLeft className="h-12 w-12" />
+        <ArrowLeft className="h-6 w-6 md:h-8 md:w-8" />
       </Button>
-      <div className="max-w-3xl mx-auto prose dark:prose-invert">
+      <div className="max-w-3xl mx-auto prose dark:prose-invert p-4 pt-16 md:p-8">
         <h1 className="text-4xl font-bold mb-6">EasyTL Terms of Service</h1>
 
         <p className="mb-4">

@@ -9,7 +9,7 @@ import { Link } from 'react-router-dom';
 const Footer = () => 
 {
   return (
-    <footer className="absolute bottom-0 left-0 w-full py-4 text-sm text-gray-500 dark:text-gray-400 text-center">
+    <footer className="mt-auto py-4 text-sm text-gray-500 dark:text-gray-400 text-center">
       <div className="flex flex-col gap-2">
         <span>Made by <Link 
           to="https://kakusui.org" 
@@ -19,7 +19,7 @@ const Footer = () =>
         >
           Kakusui LLC
         </Link> © Copyright 2024</span>
-        <div className="flex justify-center items-center gap-4">
+        <div className="flex flex-wrap justify-center items-center gap-4 px-4">
           <Link 
             to="/terms"
             className="link-underline hover:text-gray-700 dark:hover:text-gray-300 transition-colors"

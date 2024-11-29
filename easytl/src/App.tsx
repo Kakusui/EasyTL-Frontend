@@ -17,9 +17,11 @@ import About from '@/pages/About'
 const MainLayout = () =>
 {
   return (
-    <main className="min-h-screen w-screen bg-gray-100 dark:bg-gray-900 flex items-center justify-center relative">
-      <div className="w-[800px] max-w-[90vw] p-6">
-        <TranslationInterface />
+    <main className="min-h-screen w-screen bg-gray-100 dark:bg-gray-900 flex flex-col">
+      <div className="flex-grow flex items-center justify-center">
+        <div className="w-[800px] max-w-[90vw] p-6">
+          <TranslationInterface />
+        </div>
       </div>
       <Footer />
     </main>
