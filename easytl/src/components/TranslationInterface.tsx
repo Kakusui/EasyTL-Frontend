@@ -29,7 +29,7 @@ export default function TranslationInterface()
   const [isLoading, setIsLoading] = useState(false)
   const [detectedLanguage, setDetectedLanguage] = useState('')
   const [loginDialogOpen, setLoginDialogOpen] = useState(false)
-  const { isLoggedIn, logout } = useAuth()
+  const { isLoggedIn } = useAuth()
   const { theme, setTheme } = useTheme()
 
   const handleSubmit = async () => 
@@ -71,10 +71,10 @@ export default function TranslationInterface()
             variant="ghost" 
             size="sm" 
             className="flex items-center gap-2 text-foreground hover:bg-accent"
-            onClick={() => isLoggedIn ? logout() : setLoginDialogOpen(true)}
+            onClick={() => setLoginDialogOpen(true)}
           >
             <UserIcon className="h-5 w-5" />
-            <span>{isLoggedIn ? 'Logout' : 'Login'}</span>
+            <span>{isLoggedIn ? 'Profile' : 'Login'}</span>
           </Button>
         </div>
       </div>
