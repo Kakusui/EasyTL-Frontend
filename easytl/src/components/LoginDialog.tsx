@@ -9,6 +9,7 @@ import { useAuth } from '@/contexts/AuthContext'
 import { GoogleLogin } from '@react-oauth/google'
 import { getURL } from '@/utils'
 import { useToast } from '@/hooks/use-toast'
+import { Button } from '@/components/ui/button'
 
 export function LoginDialog({
   open,
@@ -18,16 +19,18 @@ export function LoginDialog({
   onOpenChange: (open: boolean) => void
 }) 
 {
-  const { login, isLoggedIn, userEmail, credits } = useAuth()
+  const { login, logout, isLoggedIn, userEmail, credits } = useAuth()
   const { toast } = useToast()
 
-  const handleGoogleLogin = async (credentialResponse: any) => 
+  const handleGoogleLogin = async (credentialResponse:any) => 
   {
     try 
     {
-      const response = await fetch(getURL('/auth/google-login'), {
+      const response = await fetch(getURL('/auth/google-login'), 
+      {
         method: 'POST',
-        headers: {
+        headers: 
+        {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({ token: credentialResponse.credential }),
@@ -41,7 +44,8 @@ export function LoginDialog({
         {
           await login(data.access_token)
           onOpenChange(false)
-          toast({
+          toast(
+          {
             title: "Welcome!",
             description: "You have been logged in successfully"
           })
@@ -49,7 +53,8 @@ export function LoginDialog({
       } 
       else 
       {
-        toast({
+        toast(
+        {
           variant: "destructive",
           title: "Google login failed",
           description: "Unable to login with Google. Please try again."
@@ -58,7 +63,8 @@ export function LoginDialog({
     } 
     catch (error) 
     {
-      toast({
+      toast(
+      {
         variant: "destructive",
         title: "Error",
         description: "Failed to login with Google. Please try again."
@@ -85,6 +91,26 @@ export function LoginDialog({
               <label className="text-sm font-medium text-muted-foreground">Credits</label>
               <p className="text-foreground">{credits}</p>
             </div>
+            <div>
+              <label className="text-sm font-medium text-muted-foreground">User ID</label>
+              <p className="text-sm text-muted-foreground">{localStorage.getItem('user_id')}</p>
+            </div>
+            <Button 
+              variant="destructive" 
+              className="w-full"
+              onClick={() => 
+              {
+                logout()
+                onOpenChange(false)
+                toast(
+                {
+                  title: "Logged out",
+                  description: "You have been logged out successfully"
+                })
+              }}
+            >
+              Logout
+            </Button>
           </div>
         </DialogContent>
       </Dialog>
@@ -95,9 +121,7 @@ export function LoginDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="w-[90vw] max-w-[400px] bg-background border-border">
         <DialogHeader>
-          <DialogTitle className="text-foreground">
-            Login with Google
-          </DialogTitle>
+          <DialogTitle className="text-foreground">Login with Google</DialogTitle>
         </DialogHeader>
         
         <div className="flex justify-center w-full py-4">
