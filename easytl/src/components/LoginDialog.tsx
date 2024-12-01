@@ -10,6 +10,14 @@ import { GoogleLogin } from '@react-oauth/google'
 import { getURL } from '@/utils'
 import { useToast } from '@/hooks/use-toast'
 import { Button } from '@/components/ui/button'
+import { useEffect, useState } from 'react'
+
+interface UserInfo 
+{
+  id: string
+  email: string
+  credits: number
+}
 
 export function LoginDialog({
   open,
@@ -19,8 +27,51 @@ export function LoginDialog({
   onOpenChange: (open: boolean) => void
 }) 
 {
-  const { login, logout, isLoggedIn, userEmail, credits } = useAuth()
+  const { login, logout, isLoggedIn, userEmail } = useAuth()
   const { toast } = useToast()
+  const [userInfo, setUserInfo] = useState<UserInfo | null>(null)
+
+  useEffect(() => 
+  {
+    const fetchUserInfo = async () => 
+    {
+      if(!isLoggedIn || !open) 
+      {
+        return
+      }
+
+      try 
+      {
+        const response = await fetch(getURL('/user/info'), 
+        {
+          method: 'GET',
+          headers: 
+          {
+            'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
+            'Content-Type': 'application/json'
+          }
+        })
+
+        if(response.ok) 
+        {
+          const data = await response.json()
+          setUserInfo(data)
+        }
+      } 
+      catch (error) 
+      {
+        console.error('Error fetching user info:', error)
+        toast(
+        {
+          title: "Error",
+          description: "Failed to load user information",
+          variant: "destructive"
+        })
+      }
+    }
+
+    fetchUserInfo()
+  }, [isLoggedIn, open, toast])
 
   const handleGoogleLogin = async (credentialResponse:any) => 
   {
@@ -85,15 +136,15 @@ export function LoginDialog({
           <div className="py-4 space-y-4">
             <div>
               <label className="text-sm font-medium text-muted-foreground">Email</label>
-              <p className="text-foreground">{userEmail}</p>
+              <p className="text-foreground">{userInfo?.email || userEmail}</p>
             </div>
             <div>
               <label className="text-sm font-medium text-muted-foreground">Credits</label>
-              <p className="text-foreground">{credits}</p>
+              <p className="text-foreground">{userInfo?.credits || 0}</p>
             </div>
             <div>
               <label className="text-sm font-medium text-muted-foreground">User ID</label>
-              <p className="text-sm text-muted-foreground">{localStorage.getItem('user_id')}</p>
+              <p className="text-sm text-muted-foreground">{userInfo?.id || 'Loading...'}</p>
             </div>
             <Button 
               variant="destructive" 
