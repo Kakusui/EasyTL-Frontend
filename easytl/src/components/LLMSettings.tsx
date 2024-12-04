@@ -35,11 +35,26 @@ export default function LLMSettings({
     }
   }
 
+  const handleLLMChange = (value: string) => 
+  {
+    setSelectedLLM(value)
+    // Set the first model of the new provider as default
+    const models = getModelOptions(value)
+    if(models.length > 0) 
+    {
+      setSelectedModel(models[0])
+    } 
+    else 
+    {
+      setSelectedModel('')
+    }
+  }
+
   return (
     <div className="space-y-2">
-      <Select value={selectedLLM} onValueChange={setSelectedLLM}>
+      <Select value={selectedLLM} onValueChange={handleLLMChange}>
         <SelectTrigger>
-          <SelectValue placeholder="Select LLM" />
+          <SelectValue placeholder="Select AI Provider" />
         </SelectTrigger>
         <SelectContent>
           <SelectItem value="OpenAI">OpenAI</SelectItem>
@@ -53,7 +68,7 @@ export default function LLMSettings({
         onValueChange={setSelectedModel}
       >
         <SelectTrigger>
-          <SelectValue placeholder="Select Model" />
+          <SelectValue placeholder={selectedLLM ? "Select Model" : "Select AI Provider first"} />
         </SelectTrigger>
         <SelectContent>
           {getModelOptions(selectedLLM).map((model) => (

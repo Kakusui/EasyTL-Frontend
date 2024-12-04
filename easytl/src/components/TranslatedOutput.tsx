@@ -14,13 +14,13 @@ interface TranslatedOutputProps
   text: string;
   onSwap: () => void;
   onClose: () => void;
+  isStreaming: boolean;
 }
 
-export default function TranslatedOutput({ text, onSwap, onClose }: TranslatedOutputProps) 
+export default function TranslatedOutput({ text, onSwap, onClose, isStreaming }: TranslatedOutputProps) 
 {
   const [copyIcon, setCopyIcon] = useState(<CopyIcon className="h-4 w-4" />)
   const [downloadIcon, setDownloadIcon] = useState(<DownloadIcon className="h-4 w-4" />)
-  const isTranslating = text === 'Translating...'
   const hasError = text === 'Translation failed. Please try again.'
 
   const handleCopy = () => 
@@ -50,17 +50,17 @@ export default function TranslatedOutput({ text, onSwap, onClose }: TranslatedOu
       <div className="flex justify-between mb-2">
         <div className="flex items-center gap-2">
           <h3 className="text-lg font-semibold">Translated Text</h3>
-          {isTranslating && <Loader2 className="h-4 w-4 animate-spin" />}
+          {isStreaming && <Loader2 className="h-4 w-4 animate-spin" />}
           {hasError && <AlertCircle className="h-4 w-4 text-destructive" />}
         </div>
         <div className="space-x-2">
-          <Button variant="outline" size="icon" onClick={handleCopy} disabled={isTranslating || hasError}>
+          <Button variant="outline" size="icon" onClick={handleCopy} disabled={isStreaming || hasError}>
             {copyIcon}
           </Button>
-          <Button variant="outline" size="icon" onClick={handleDownload} disabled={isTranslating || hasError}>
+          <Button variant="outline" size="icon" onClick={handleDownload} disabled={isStreaming || hasError}>
             {downloadIcon}
           </Button>
-          <Button variant="outline" size="icon" onClick={onSwap} disabled={isTranslating || hasError}>
+          <Button variant="outline" size="icon" onClick={onSwap} disabled={isStreaming || hasError}>
             <ArrowUpDownIcon className="h-4 w-4" />
           </Button>
           <Button variant="outline" size="icon" onClick={onClose}>

@@ -12,6 +12,13 @@ import { ChevronDownIcon, ChevronUpIcon } from 'lucide-react'
 export default function AdvancedSettings() 
 {
   const [isExpanded, setIsExpanded] = useState(false)
+  const defaultFormat = `You are a professional translator, please translate the text given to you following the below instructions. Do not use quotations or say anything else aside from the translation in your response.
+Language: {{language}}
+Tone: {{tone}}
+{{#if additional_instructions}}
+Additional instructions:
+{{additional_instructions}}
+{{/if}}`
 
   return (
     <div className="space-y-2">
@@ -26,19 +33,20 @@ export default function AdvancedSettings()
       {isExpanded && (
         <div className="space-y-2">
           <div>
-            <label htmlFor="custom-format" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Custom Instruction Format</label>
+            <label className="block text-sm font-medium mb-1">Custom Instruction Format</label>
             <Textarea
-              id="custom-format"
+              defaultValue={defaultFormat}
               placeholder="Enter custom format (use {{language}} and {{tone}} placeholders)"
               className="mt-1"
+              rows={6}
             />
           </div>
           <div>
-            <label htmlFor="additional-instructions" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Additional Instructions</label>
+            <label className="block text-sm font-medium mb-1">Additional Instructions</label>
             <Textarea
-              id="additional-instructions"
               placeholder="Enter any additional translation requirements"
               className="mt-1"
+              rows={4}
             />
           </div>
         </div>

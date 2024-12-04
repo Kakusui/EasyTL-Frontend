@@ -48,6 +48,8 @@ export default function TranslationInterface()
   const [selectedModel, setSelectedModel] = useState('')
   const [apiKey, setApiKey] = useState('')
   const [useCredits, setUseCredits] = useState(true)
+  const [streamingResponse, setStreamingResponse] = useState('')
+  const [isStreaming, setIsStreaming] = useState(false)
 
   // Load saved preferences on component mount
   useEffect(() => 
@@ -184,6 +186,8 @@ Tone: Formal; Polite`,
     setIsLoading(true)
     setShowOutput(true)
     setOutputText('Translating...')
+    setStreamingResponse('') // Clear previous streaming response
+    setIsStreaming(true)
 
     try 
     {
@@ -199,7 +203,7 @@ Tone: Formal; Polite`,
         using_credits: useCredits
       }
 
-      const response = await fetch(getURL("/proxy/easytl"), 
+      const response = await fetch(getURL("/proxy/easytl/stream"), 
       {
         method: "POST",
         headers: 
@@ -216,13 +220,62 @@ Tone: Formal; Polite`,
         throw new Error(`HTTP error! status: ${response.status} ${errorText}`)
       }
 
-      const result = await response.json()
-      setResponse(result)
-      setOutputText(result.translatedText)
-      if(useCredits && result.credits !== undefined) 
+      let fullText = ""
+      const reader = response.body?.getReader()
+      const decoder = new TextDecoder()
+
+      if(!reader) 
       {
-        updateCredits(result.credits)
+        throw new Error("Failed to get response reader")
       }
+
+      try 
+      {
+        while(true) 
+        {
+          const { done, value } = await reader.read()
+          
+          if(done) break
+          
+          const chunk = decoder.decode(value, { stream: true })
+          const lines = chunk.split('\n')
+
+          for(const line of lines) 
+          {
+            if(line.startsWith('data: ')) 
+            {
+              const jsonStr = line.slice(6)
+              if(jsonStr === '[DONE]') continue
+
+              try 
+              {
+                const data = JSON.parse(jsonStr)
+                if(data.text) 
+                {
+                  fullText += data.text
+                  setStreamingResponse(fullText)
+                } 
+                else if(data.credits) 
+                {
+                  updateCredits(data.credits)
+                }
+              } 
+              catch(e) 
+              {
+                console.error('Failed to parse JSON:', e)
+              }
+            }
+          }
+        }
+      } 
+      finally 
+      {
+        reader.releaseLock()
+      }
+
+      // Set the final response after streaming is complete
+      setResponse({ translatedText: fullText })
+      setOutputText(fullText)
     } 
     catch (error) 
     {
@@ -236,6 +289,7 @@ Tone: Formal; Polite`,
     finally 
     {
       setIsLoading(false)
+      setIsStreaming(false)
     }
   }
 
@@ -257,6 +311,16 @@ Tone: Formal; Polite`,
       <div className="px-6 py-4 border-b border-border flex justify-between items-center">
         <h1 className="text-2xl font-bold text-foreground">EasyTL</h1>
         <div className="flex items-center gap-2">
+          {isLoggedIn && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setLoginDialogOpen(true)}
+              className="text-foreground hover:bg-accent"
+            >
+              {credits} Credits
+            </Button>
+          )}
           <Button
             variant="ghost"
             size="icon"
@@ -325,9 +389,10 @@ Tone: Formal; Polite`,
         {showOutput && (
           <div className="mt-6">
             <TranslatedOutput 
-              text={outputText} 
+              text={isStreaming ? streamingResponse : outputText} 
               onSwap={handleSwap} 
-              onClose={handleCloseOutput} 
+              onClose={handleCloseOutput}
+              isStreaming={isStreaming}
             />
           </div>
         )}

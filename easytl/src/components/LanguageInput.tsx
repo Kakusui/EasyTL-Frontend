@@ -118,19 +118,33 @@ export default function LanguageInput({
     }
   }
 
-  const handleLanguageSelect = (value: string) => 
-  {
-    setDetectedLanguage(value)
-    setCustomLanguage('')
-  }
-
+  // Use custom language if dropdown is not selected
   useEffect(() => 
   {
-    if(customLanguage) 
+    if(!detectedLanguage && customLanguage) 
     {
-      setDetectedLanguage('')
+      setDetectedLanguage(customLanguage)
     }
-  }, [customLanguage, setDetectedLanguage])
+  }, [customLanguage, detectedLanguage, setDetectedLanguage])
+
+  const handleLanguageSelect = (value: string) => 
+  {
+    if(value) 
+    {
+      setDetectedLanguage(value)
+      setCustomLanguage('')
+    }
+  }
+
+  const handleCustomLanguageChange = (e: React.ChangeEvent<HTMLInputElement>) => 
+  {
+    const value = e.target.value
+    setCustomLanguage(value)
+    if(value) 
+    {
+      setDetectedLanguage(value)
+    }
+  }
 
   return (
     <div className="space-y-2">
@@ -154,7 +168,7 @@ export default function LanguageInput({
         type="text"
         placeholder="Or type a language"
         value={customLanguage}
-        onChange={(e) => setCustomLanguage(e.target.value)}
+        onChange={handleCustomLanguageChange}
         className="w-full"
       />
     </div>
