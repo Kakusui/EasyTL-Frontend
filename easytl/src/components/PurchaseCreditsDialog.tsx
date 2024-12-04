@@ -7,13 +7,13 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { useToast } from '@/hooks/use-toast'
-import { getURL } from '@/utils'
+import { getURL, getPublishableStripeKey } from '@/utils'
 import { loadStripe } from '@stripe/stripe-js'
 import { useState, useEffect } from 'react'
 import { CheckIcon, XIcon } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
 
-const stripePromise = loadStripe(process.env.VITE_STRIPE_PUBLIC_KEY || '')
+const stripePromise = loadStripe(getPublishableStripeKey())
 
 interface PurchaseCreditsDialogProps 
 {
