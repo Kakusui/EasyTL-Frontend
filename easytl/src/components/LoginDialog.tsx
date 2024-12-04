@@ -11,6 +11,7 @@ import { getURL } from '@/utils'
 import { useToast } from '@/hooks/use-toast'
 import { Button } from '@/components/ui/button'
 import { useEffect, useState } from 'react'
+import { PurchaseCreditsDialog } from './PurchaseCreditsDialog'
 
 interface UserInfo 
 {
@@ -30,6 +31,7 @@ export function LoginDialog({
   const { login, logout, isLoggedIn, userEmail } = useAuth()
   const { toast } = useToast()
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null)
+  const [purchaseDialogOpen, setPurchaseDialogOpen] = useState(false)
 
   useEffect(() => 
   {
@@ -127,44 +129,55 @@ export function LoginDialog({
   if(isLoggedIn) 
   {
     return (
-      <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="w-[90vw] max-w-[400px] bg-background border-border">
-          <DialogHeader>
-            <DialogTitle className="text-foreground">Profile</DialogTitle>
-          </DialogHeader>
-          
-          <div className="py-4 space-y-4">
-            <div>
-              <label className="text-sm font-medium text-muted-foreground">Email</label>
-              <p className="text-foreground">{userInfo?.email || userEmail}</p>
-            </div>
-            <div>
-              <label className="text-sm font-medium text-muted-foreground">Credits</label>
-              <p className="text-foreground">{userInfo?.credits || 0}</p>
-            </div>
-            <div>
-              <label className="text-sm font-medium text-muted-foreground">User ID</label>
-              <p className="text-sm text-muted-foreground">{userInfo?.id || 'Loading...'}</p>
-            </div>
-            <Button 
-              variant="destructive" 
-              className="w-full"
-              onClick={() => 
-              {
-                logout()
-                onOpenChange(false)
-                toast(
+      <>
+        <Dialog open={open} onOpenChange={onOpenChange}>
+          <DialogContent className="w-[90vw] max-w-[400px] bg-background border-border">
+            <DialogHeader>
+              <DialogTitle className="text-foreground">Profile</DialogTitle>
+            </DialogHeader>
+            
+            <div className="py-4 space-y-4">
+              <div>
+                <label className="text-sm font-medium text-muted-foreground">Email</label>
+                <p className="text-foreground">{userInfo?.email || userEmail}</p>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-muted-foreground">Credits</label>
+                <p className="text-foreground">{userInfo?.credits || 0}</p>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-muted-foreground">User ID</label>
+                <p className="text-sm text-muted-foreground">{userInfo?.id || 'Loading...'}</p>
+              </div>
+              <Button 
+                className="w-full bg-orange-500 hover:bg-orange-600"
+                onClick={() => setPurchaseDialogOpen(true)}
+              >
+                Purchase Credits
+              </Button>
+              <Button 
+                variant="destructive" 
+                className="w-full"
+                onClick={() => 
                 {
-                  title: "Logged out",
-                  description: "You have been logged out successfully"
-                })
-              }}
-            >
-              Logout
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
+                  logout()
+                  onOpenChange(false)
+                  toast({
+                    title: "Logged out",
+                    description: "You have been logged out successfully"
+                  })
+                }}
+              >
+                Logout
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+        <PurchaseCreditsDialog 
+          open={purchaseDialogOpen} 
+          onOpenChange={setPurchaseDialogOpen} 
+        />
+      </>
     )
   }
 
