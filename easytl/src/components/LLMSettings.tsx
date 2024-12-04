@@ -4,48 +4,61 @@
 
 // maintain allman bracket style for consistency
 
-import { useState } from 'react'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 
-export default function LLMSettings() 
+interface LLMSettingsProps {
+  selectedLLM: string;
+  setSelectedLLM: (llm: string) => void;
+  selectedModel: string;
+  setSelectedModel: (model: string) => void;
+}
+
+export default function LLMSettings({ 
+  selectedLLM, 
+  setSelectedLLM,
+  selectedModel,
+  setSelectedModel 
+}: LLMSettingsProps) 
 {
-  const [selectedLLM, setSelectedLLM] = useState('')
+  const getModelOptions = (llm: string) => 
+  {
+    switch(llm)
+    {
+      case "OpenAI":
+        return ["gpt-3.5-turbo", "gpt-4", "gpt-4-turbo", "gpt-4o", "gpt-4o-mini"]
+      case "Gemini":
+        return ["gemini-1.0-pro", "gemini-1.5-pro", "gemini-1.5-flash"];
+      case "Anthropic":
+        return ["claude-3-haiku-20240307", "claude-3-sonnet-20240229", "claude-3-opus-20240229", "claude-3-5-sonnet-20240620"]
+      default:
+        return [];
+    }
+  }
 
   return (
     <div className="space-y-2">
-      <Select onValueChange={setSelectedLLM}>
+      <Select value={selectedLLM} onValueChange={setSelectedLLM}>
         <SelectTrigger>
           <SelectValue placeholder="Select LLM" />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="openai">OpenAI</SelectItem>
-          <SelectItem value="gemini">Gemini</SelectItem>
-          <SelectItem value="anthropic">Anthropic</SelectItem>
+          <SelectItem value="OpenAI">OpenAI</SelectItem>
+          <SelectItem value="Gemini">Gemini</SelectItem>
+          <SelectItem value="Anthropic">Anthropic</SelectItem>
         </SelectContent>
       </Select>
-      <Select disabled={!selectedLLM}>
+      <Select 
+        disabled={!selectedLLM}
+        value={selectedModel}
+        onValueChange={setSelectedModel}
+      >
         <SelectTrigger>
           <SelectValue placeholder="Select Model" />
         </SelectTrigger>
         <SelectContent>
-          {selectedLLM === 'openai' && (
-            <>
-              <SelectItem value="gpt-3.5-turbo">GPT-3.5 Turbo</SelectItem>
-              <SelectItem value="gpt-4">GPT-4</SelectItem>
-            </>
-          )}
-          {selectedLLM === 'gemini' && (
-            <>
-              <SelectItem value="gemini-pro">Gemini Pro</SelectItem>
-              <SelectItem value="gemini-ultra">Gemini Ultra</SelectItem>
-            </>
-          )}
-          {selectedLLM === 'anthropic' && (
-            <>
-              <SelectItem value="claude-2">Claude 2</SelectItem>
-              <SelectItem value="claude-instant">Claude Instant</SelectItem>
-            </>
-          )}
+          {getModelOptions(selectedLLM).map((model) => (
+            <SelectItem key={model} value={model}>{model}</SelectItem>
+          ))}
         </SelectContent>
       </Select>
     </div>

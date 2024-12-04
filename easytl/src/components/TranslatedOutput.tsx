@@ -7,7 +7,7 @@
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
-import { ArrowUpDownIcon, DownloadIcon, CopyIcon, XIcon, CheckIcon } from 'lucide-react'
+import { ArrowUpDownIcon, DownloadIcon, CopyIcon, XIcon, CheckIcon, Loader2, AlertCircle } from 'lucide-react'
 
 interface TranslatedOutputProps 
 {
@@ -20,6 +20,8 @@ export default function TranslatedOutput({ text, onSwap, onClose }: TranslatedOu
 {
   const [copyIcon, setCopyIcon] = useState(<CopyIcon className="h-4 w-4" />)
   const [downloadIcon, setDownloadIcon] = useState(<DownloadIcon className="h-4 w-4" />)
+  const isTranslating = text === 'Translating...'
+  const hasError = text === 'Translation failed. Please try again.'
 
   const handleCopy = () => 
   {
@@ -46,15 +48,19 @@ export default function TranslatedOutput({ text, onSwap, onClose }: TranslatedOu
   return (
     <div className="p-6 border-t">
       <div className="flex justify-between mb-2">
-        <h3 className="text-lg font-semibold">Translated Text</h3>
+        <div className="flex items-center gap-2">
+          <h3 className="text-lg font-semibold">Translated Text</h3>
+          {isTranslating && <Loader2 className="h-4 w-4 animate-spin" />}
+          {hasError && <AlertCircle className="h-4 w-4 text-destructive" />}
+        </div>
         <div className="space-x-2">
-          <Button variant="outline" size="icon" onClick={handleCopy}>
+          <Button variant="outline" size="icon" onClick={handleCopy} disabled={isTranslating || hasError}>
             {copyIcon}
           </Button>
-          <Button variant="outline" size="icon" onClick={handleDownload}>
+          <Button variant="outline" size="icon" onClick={handleDownload} disabled={isTranslating || hasError}>
             {downloadIcon}
           </Button>
-          <Button variant="outline" size="icon" onClick={onSwap}>
+          <Button variant="outline" size="icon" onClick={onSwap} disabled={isTranslating || hasError}>
             <ArrowUpDownIcon className="h-4 w-4" />
           </Button>
           <Button variant="outline" size="icon" onClick={onClose}>
@@ -65,7 +71,9 @@ export default function TranslatedOutput({ text, onSwap, onClose }: TranslatedOu
       <Textarea 
         value={text} 
         readOnly 
-        className="min-h-[200px] bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100" 
+        className={`min-h-[200px] bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 ${
+          hasError ? 'text-destructive' : ''
+        }`}
       />
     </div>
   )

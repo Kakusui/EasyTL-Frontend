@@ -14,6 +14,7 @@ import Footer from '@/components/Footer'
 import Terms from '@/pages/Terms'
 import Privacy from '@/pages/Privacy'
 import About from '@/pages/About'
+import { Toaster } from "@/components/ui/toaster"
 const MainLayout = () =>
 {
   return (
@@ -56,6 +57,7 @@ export default function App()
           </BrowserRouter>
         </ThemeProvider>
       </AuthProvider>
+      <Toaster />
     </GoogleOAuthProvider>
   )
 }

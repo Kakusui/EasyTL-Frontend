@@ -12,9 +12,20 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { EyeIcon, EyeOffIcon } from 'lucide-react'
 
-export default function PaymentMethod() 
+interface PaymentMethodProps {
+  apiKey: string;
+  setApiKey: (key: string) => void;
+  useCredits: boolean;
+  setUseCredits: (useCredits: boolean) => void;
+}
+
+export default function PaymentMethod({ 
+  apiKey, 
+  setApiKey, 
+  useCredits, 
+  setUseCredits 
+}: PaymentMethodProps) 
 {
-  const [paymentMethod, setPaymentMethod] = useState('credits')
   const [showApiKey, setShowApiKey] = useState(false)
 
   return (
@@ -27,8 +38,8 @@ export default function PaymentMethod()
             id="credits" 
             name="payment" 
             value="credits"
-            checked={paymentMethod === 'credits'}
-            onChange={(e) => setPaymentMethod(e.target.value)}
+            checked={useCredits}
+            onChange={() => setUseCredits(true)}
             className="w-4 h-4"
           />
           <Label htmlFor="credits">Credits (requires login)</Label>
@@ -39,18 +50,20 @@ export default function PaymentMethod()
             id="api-key" 
             name="payment" 
             value="api-key"
-            checked={paymentMethod === 'api-key'}
-            onChange={(e) => setPaymentMethod(e.target.value)}
+            checked={!useCredits}
+            onChange={() => setUseCredits(false)}
             className="w-4 h-4"
           />
           <Label htmlFor="api-key">API Key</Label>
         </div>
       </div>
-      {paymentMethod === 'api-key' && (
+      {!useCredits && (
         <div className="flex space-x-2 mt-2">
           <Input
             type={showApiKey ? 'text' : 'password'}
             placeholder="Enter your API key"
+            value={apiKey}
+            onChange={(e) => setApiKey(e.target.value)}
             className="flex-grow"
           />
           <Button

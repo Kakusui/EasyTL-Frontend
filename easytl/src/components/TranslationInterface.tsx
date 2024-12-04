@@ -6,7 +6,7 @@
 
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useTheme } from 'next-themes'
 import { SunIcon, MoonIcon, UserIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -20,6 +20,15 @@ import SubmitButton from './SubmitButton'
 import TranslatedOutput from './TranslatedOutput'
 import { useAuth } from '@/contexts/AuthContext'
 import { LoginDialog } from './LoginDialog'
+import { useToast } from '@/hooks/use-toast'
+import { getURL } from '@/utils'
+import Cookies from 'js-cookie'
+
+interface ResponseValues 
+{
+  translatedText: string;
+  credits?: number;
+}
 
 export default function TranslationInterface()
 {
@@ -31,14 +40,151 @@ export default function TranslationInterface()
   const [loginDialogOpen, setLoginDialogOpen] = useState(false)
   const { isLoggedIn } = useAuth()
   const { theme, setTheme } = useTheme()
+  const [showOutput, setShowOutput] = useState(false)
+  const [_, setResponse] = useState<ResponseValues | null>(null)
+  const toast = useToast()
+  const access_token = localStorage.getItem('access_token')
+  const [selectedLLM, setSelectedLLM] = useState('')
+  const [selectedModel, setSelectedModel] = useState('')
+  const [apiKey, setApiKey] = useState('')
+  const [useCredits, setUseCredits] = useState(true)
+
+  // Load saved preferences on component mount
+  useEffect(() => 
+  {
+    const savedLLM = localStorage.getItem('easytl_llm')
+    const savedModel = localStorage.getItem('easytl_model')
+    const savedLanguage = localStorage.getItem('easytl_language')
+    const savedUseCredits = localStorage.getItem('easytl_use_credits')
+    const savedApiKey = Cookies.get(`easytl_${savedLLM?.toLowerCase()}_apiKey`)
+    
+    if(savedLLM) setSelectedLLM(savedLLM)
+    if(savedModel) setSelectedModel(savedModel)
+    if(savedLanguage) setDetectedLanguage(savedLanguage)
+    if(savedUseCredits) setUseCredits(savedUseCredits === 'true')
+    if(savedApiKey) setApiKey(savedApiKey)
+  }, [])
+
+  // Save preferences when they change
+  useEffect(() => 
+  {
+    if(selectedLLM) localStorage.setItem('easytl_llm', selectedLLM)
+    if(selectedModel) localStorage.setItem('easytl_model', selectedModel)
+    if(detectedLanguage) localStorage.setItem('easytl_language', detectedLanguage)
+    localStorage.setItem('easytl_use_credits', useCredits.toString())
+    if(apiKey) 
+    {
+      Cookies.set(`easytl_${selectedLLM.toLowerCase()}_apiKey`, apiKey, {
+        secure: true,
+        sameSite: 'strict'
+      })
+    }
+  }, [selectedLLM, selectedModel, detectedLanguage, useCredits, apiKey])
 
   const handleSubmit = async () => 
   {
+    if(!selectedLLM) 
+    {
+      toast.toast({
+        title: "Missing Provider",
+        description: "Please select an AI provider (OpenAI, Anthropic, etc.)",
+        variant: "destructive"
+      })
+      return
+    }
+
+    if(!selectedModel) 
+    {
+      toast.toast({
+        title: "Missing Model",
+        description: "Please select a model for the chosen provider",
+        variant: "destructive"
+      })
+      return
+    }
+
+    if(!inputText.trim()) 
+    {
+      toast.toast({
+        title: "Missing Text",
+        description: "Please enter some text to translate",
+        variant: "destructive"
+      })
+      return
+    }
+
+    if(!detectedLanguage) 
+    {
+      toast.toast({
+        title: "Missing Language",
+        description: "Please select a target language for translation",
+        variant: "destructive"
+      })
+      return
+    }
+
+    if(useCredits && !isLoggedIn) 
+    {
+      toast.toast({
+        title: "Login Required",
+        description: "Please login to use credits or switch to API key",
+        variant: "destructive"
+      })
+      return
+    }
+
     setIsLoading(true)
-    // Simulating API call
-    await new Promise(resolve => setTimeout(resolve, 2000))
-    setOutputText('This is a simulated translation output.')
-    setIsLoading(false)
+    setShowOutput(true)
+    setOutputText('Translating...')
+
+    try 
+    {
+      const requestBody = 
+      {
+        textToTranslate: inputText,
+        translationInstructions: `You are a professional translator, please translate the text given to you following the below instructions. Do not use quotations or say anything else aside from the translation in your response.
+Language: ${detectedLanguage}
+Tone: Formal; Polite`,
+        llmType: selectedLLM.toLowerCase(),
+        userAPIKey: useCredits ? "" : apiKey,
+        model: selectedModel,
+        using_credits: useCredits
+      }
+
+      const response = await fetch(getURL("/proxy/easytl"), 
+      {
+        method: "POST",
+        headers: 
+        { 
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${access_token}` 
+        },
+        body: JSON.stringify(requestBody),
+      })
+
+      if(!response.ok) 
+      {
+        const errorText = await response.text()
+        throw new Error(`HTTP error! status: ${response.status} ${errorText}`)
+      }
+
+      const result = await response.json()
+      setResponse(result)
+      setOutputText(result.translatedText)
+    } 
+    catch (error) 
+    {
+      toast.toast({
+        title: "An error occurred",
+        description: (error as Error).message || "Failed to translate text",
+        variant: "destructive"
+      })
+      setOutputText('Translation failed. Please try again.')
+    } 
+    finally 
+    {
+      setIsLoading(false)
+    }
   }
 
   const handleSwap = () => 
@@ -49,6 +195,7 @@ export default function TranslationInterface()
 
   const handleCloseOutput = () => 
   {
+    setShowOutput(false)
     setOutputText('')
   }
 
@@ -97,8 +244,18 @@ export default function TranslationInterface()
 
           {/* Right Column */}
           <div className="space-y-4">
-            <LLMSettings />
-            <PaymentMethod />
+            <LLMSettings 
+              selectedLLM={selectedLLM}
+              setSelectedLLM={setSelectedLLM}
+              selectedModel={selectedModel}
+              setSelectedModel={setSelectedModel}
+            />
+            <PaymentMethod 
+              apiKey={apiKey}
+              setApiKey={setApiKey}
+              useCredits={useCredits}
+              setUseCredits={setUseCredits}
+            />
             <AdvancedSettings />
             <SubmitButton 
               onClick={handleSubmit} 
@@ -108,7 +265,7 @@ export default function TranslationInterface()
         </div>
 
         {/* Output Section */}
-        {outputText && (
+        {showOutput && (
           <div className="mt-6">
             <TranslatedOutput 
               text={outputText} 
