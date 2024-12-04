@@ -38,7 +38,7 @@ export default function TranslationInterface()
   const [isLoading, setIsLoading] = useState(false)
   const [detectedLanguage, setDetectedLanguage] = useState('')
   const [loginDialogOpen, setLoginDialogOpen] = useState(false)
-  const { isLoggedIn } = useAuth()
+  const { isLoggedIn, credits, updateCredits } = useAuth()
   const { theme, setTheme } = useTheme()
   const [showOutput, setShowOutput] = useState(false)
   const [_, setResponse] = useState<ResponseValues | null>(null)
@@ -133,6 +133,54 @@ export default function TranslationInterface()
       return
     }
 
+    if(useCredits) 
+    {
+      try 
+      {
+        const costResponse = await fetch(getURL("/proxy/calculate-token-cost"), 
+        {
+          method: "POST",
+          headers: 
+          { 
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${access_token}` 
+          },
+          body: JSON.stringify({
+            text_to_translate: inputText,
+            translation_instructions: `You are a professional translator, please translate the text given to you following the below instructions. Do not use quotations or say anything else aside from the translation in your response.
+Language: ${detectedLanguage}
+Tone: Formal; Polite`,
+            model: selectedModel
+          }),
+        })
+
+        if(!costResponse.ok) 
+        {
+          throw new Error('Failed to calculate token cost')
+        }
+
+        const { cost } = await costResponse.json()
+        if(cost > credits) 
+        {
+          toast.toast({
+            title: "Insufficient Credits",
+            description: `This translation requires ${cost} credits, but you only have ${credits} credits`,
+            variant: "destructive"
+          })
+          return
+        }
+      } 
+      catch(error) 
+      {
+        toast.toast({
+          title: "Error",
+          description: "Failed to calculate translation cost",
+          variant: "destructive"
+        })
+        return
+      }
+    }
+
     setIsLoading(true)
     setShowOutput(true)
     setOutputText('Translating...')
@@ -171,6 +219,10 @@ Tone: Formal; Polite`,
       const result = await response.json()
       setResponse(result)
       setOutputText(result.translatedText)
+      if(useCredits && result.credits !== undefined) 
+      {
+        updateCredits(result.credits)
+      }
     } 
     catch (error) 
     {
@@ -233,7 +285,12 @@ Tone: Formal; Polite`,
           <div className="space-y-4">
             <LanguageInput 
               detectedLanguage={detectedLanguage} 
-              setDetectedLanguage={setDetectedLanguage} 
+              setDetectedLanguage={setDetectedLanguage}
+              selectedLLM={selectedLLM}
+              selectedModel={selectedModel}
+              useCredits={useCredits}
+              apiKey={apiKey}
+              inputText={inputText}
             />
             <TextInput 
               value={inputText} 

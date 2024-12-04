@@ -10,28 +10,112 @@ import { useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { getURL } from '@/utils'
+import { useAuth } from '@/contexts/AuthContext'
+import { useToast } from '@/hooks/use-toast'
 
 interface LanguageInputProps 
 {
   detectedLanguage: string;
   setDetectedLanguage: (language: string) => void;
+  selectedLLM: string;
+  selectedModel: string;
+  useCredits: boolean;
+  apiKey: string;
+  inputText: string;
 }
 
-export default function LanguageInput({ detectedLanguage, setDetectedLanguage }: LanguageInputProps) 
+export default function LanguageInput({ 
+  detectedLanguage, 
+  setDetectedLanguage,
+  selectedLLM,
+  selectedModel,
+  useCredits,
+  apiKey,
+  inputText
+}: LanguageInputProps) 
 {
   const [isDetecting, setIsDetecting] = useState(false)
   const [customLanguage, setCustomLanguage] = useState('')
+  const toast = useToast()
+  const { isLoggedIn } = useAuth()
+  const access_token = localStorage.getItem('access_token')
 
-  const handleDetect = () => 
+  const handleDetect = async () => 
   {
-    setIsDetecting(true)
-    // Simulating language detection
-    setTimeout(() => 
+    // Get text from parent component's input
+    if(!inputText.trim()) 
     {
-      setDetectedLanguage('')
-      setCustomLanguage('Custom Language')
+      toast.toast({
+        title: "No Text",
+        description: "Please enter some text in the translation box first",
+        variant: "destructive"
+      })
+      return
+    }
+
+    if(!selectedLLM || !selectedModel) 
+    {
+      toast.toast({
+        title: "Missing Settings",
+        description: "Please select an AI provider and model first",
+        variant: "destructive"
+      })
+      return
+    }
+
+    if(useCredits && !isLoggedIn) 
+    {
+      toast.toast({
+        title: "Login Required",
+        description: "Please login to use credits or switch to API key",
+        variant: "destructive"
+      })
+      return
+    }
+
+    setIsDetecting(true)
+
+    try 
+    {
+      const response = await fetch(getURL("/proxy/easytl/detect-language"), 
+      {
+        method: "POST",
+        headers: 
+        { 
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${access_token}` 
+        },
+        body: JSON.stringify({
+          text: inputText,
+          llmType: selectedLLM.toLowerCase(),
+          userAPIKey: useCredits ? "" : apiKey,
+          model: selectedModel,
+          using_credits: useCredits
+        }),
+      })
+
+      if(!response.ok) 
+      {
+        throw new Error(`Failed to detect language: ${await response.text()}`)
+      }
+
+      const result = await response.json()
+      setCustomLanguage(result.detectedLanguage)
+      setDetectedLanguage('')  // Clear the dropdown selection
+    } 
+    catch (error) 
+    {
+      toast.toast({
+        title: "Detection Failed",
+        description: (error as Error).message || "Failed to detect language",
+        variant: "destructive"
+      })
+    } 
+    finally 
+    {
       setIsDetecting(false)
-    }, 1000)
+    }
   }
 
   const handleLanguageSelect = (value: string) => 
