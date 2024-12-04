@@ -140,6 +140,21 @@ export function PurchaseCreditsDialog({ open, onOpenChange }: PurchaseCreditsDia
     }
   }
 
+  const modelCosts = {
+    'gpt-3.5-turbo': 0.040,
+    'gpt-4': 0.700,
+    'gpt-4-turbo': 0.700,
+    'gpt-4o': 0.250,
+    'gpt-4o-mini': 0.015,
+    'gemini-1.0-pro': 0.040,
+    'gemini-1.5-pro': 0.130,
+    'gemini-1.5-flash': 0.009,
+    'claude-3-haiku': 0.030,
+    'claude-3-sonnet': 0.332,
+    'claude-3-5-sonnet': 0.332,
+    'claude-3-opus': 1.660
+  }
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="w-[90vw] max-w-[400px] bg-background border-border">
@@ -171,8 +186,19 @@ export function PurchaseCreditsDialog({ open, onOpenChange }: PurchaseCreditsDia
           </div>
         ) : (
           <div className="py-4 space-y-6">
-            <div className="text-center">
+            <div className="text-center space-y-2">
               <h3 className="text-2xl font-bold text-foreground">$5 for 50,000 credits</h3>
+              <p className="text-sm text-muted-foreground">
+                Credit costs per character:
+              </p>
+              <div className="text-xs text-muted-foreground space-y-1 max-h-32 overflow-y-auto">
+                {Object.entries(modelCosts).map(([model, cost]) => (
+                  <p key={model}>{model}: {cost.toFixed(3)} credits/char</p>
+                ))}
+                <p className="text-xs italic mt-2">
+                  Costs may change, but are more likely to decrease than increase
+                </p>
+              </div>
             </div>
 
             <ul className="space-y-2">
