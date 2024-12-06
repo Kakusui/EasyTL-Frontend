@@ -28,10 +28,11 @@ export function LoginDialog({
   onOpenChange: (open: boolean) => void
 }) 
 {
-  const { login, logout, isLoggedIn, userEmail } = useAuth()
+  const { login, logout, isLoggedIn, userEmail, isLoading: authLoading } = useAuth()
   const { toast } = useToast()
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null)
   const [purchaseDialogOpen, setPurchaseDialogOpen] = useState(false)
+  const [isLoadingInfo, setIsLoadingInfo] = useState(false)
 
   useEffect(() => 
   {
@@ -42,6 +43,7 @@ export function LoginDialog({
         return
       }
 
+      setIsLoadingInfo(true)
       try 
       {
         const response = await fetch(getURL('/user/info'), 
@@ -63,16 +65,22 @@ export function LoginDialog({
       catch (error) 
       {
         console.error('Error fetching user info:', error)
-        toast(
-        {
+        toast({
           title: "Error",
           description: "Failed to load user information",
           variant: "destructive"
         })
       }
+      finally 
+      {
+        setIsLoadingInfo(false)
+      }
     }
 
-    fetchUserInfo()
+    if(open) 
+    {
+      fetchUserInfo()
+    }
   }, [isLoggedIn, open, toast])
 
   const handleGoogleLogin = async (credentialResponse:any) => 
@@ -137,39 +145,47 @@ export function LoginDialog({
             </DialogHeader>
             
             <div className="py-4 space-y-4">
-              <div>
-                <label className="text-sm font-medium text-muted-foreground">Email</label>
-                <p className="text-foreground">{userInfo?.email || userEmail}</p>
-              </div>
-              <div>
-                <label className="text-sm font-medium text-muted-foreground">Credits</label>
-                <p className="text-foreground">{userInfo?.credits || 0}</p>
-              </div>
-              <div>
-                <label className="text-sm font-medium text-muted-foreground">User ID</label>
-                <p className="text-sm text-muted-foreground">{userInfo?.id || 'Loading...'}</p>
-              </div>
-              <Button 
-                className="w-full bg-orange-500 hover:bg-orange-600"
-                onClick={() => setPurchaseDialogOpen(true)}
-              >
-                Purchase Credits
-              </Button>
-              <Button 
-                variant="destructive" 
-                className="w-full"
-                onClick={() => 
-                {
-                  logout()
-                  onOpenChange(false)
-                  toast({
-                    title: "Logged out",
-                    description: "You have been logged out successfully"
-                  })
-                }}
-              >
-                Logout
-              </Button>
+              {isLoadingInfo ? (
+                <div className="flex justify-center items-center py-8">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500" />
+                </div>
+              ) : (
+                <>
+                  <div>
+                    <label className="text-sm font-medium text-muted-foreground">Email</label>
+                    <p className="text-foreground">{userInfo?.email || userEmail}</p>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-muted-foreground">Credits</label>
+                    <p className="text-foreground">{userInfo?.credits || 0}</p>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-muted-foreground">User ID</label>
+                    <p className="text-sm text-muted-foreground">{userInfo?.id || 'Loading...'}</p>
+                  </div>
+                  <Button 
+                    className="w-full bg-orange-500 hover:bg-orange-600"
+                    onClick={() => setPurchaseDialogOpen(true)}
+                  >
+                    Purchase Credits
+                  </Button>
+                  <Button 
+                    variant="destructive" 
+                    className="w-full"
+                    onClick={() => 
+                    {
+                      logout()
+                      onOpenChange(false)
+                      toast({
+                        title: "Logged out",
+                        description: "You have been logged out successfully"
+                      })
+                    }}
+                  >
+                    Logout
+                  </Button>
+                </>
+              )}
             </div>
           </DialogContent>
         </Dialog>
@@ -189,12 +205,16 @@ export function LoginDialog({
         </DialogHeader>
         
         <div className="flex justify-center w-full py-4">
-          <div className="dark:invert">
-            <GoogleLogin
-              onSuccess={handleGoogleLogin}
-              onError={() => console.error('Google login failed')}
-            />
-          </div>
+          {authLoading ? (
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500" />
+          ) : (
+            <div className="dark:invert">
+              <GoogleLogin
+                onSuccess={handleGoogleLogin}
+                onError={() => console.error('Google login failed')}
+              />
+            </div>
+          )}
         </div>
       </DialogContent>
     </Dialog>
