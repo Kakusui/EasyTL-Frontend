@@ -9,8 +9,19 @@ import { Textarea } from '@/components/ui/textarea'
 import { Button } from '@/components/ui/button'
 import { ChevronDownIcon, ChevronUpIcon } from 'lucide-react'
 
-export default function AdvancedSettings() 
-{
+interface AdvancedSettingsProps {
+  customFormat: string;
+  setCustomFormat: (format: string) => void;
+  additionalInstructions: string;
+  setAdditionalInstructions: (instructions: string) => void;
+}
+
+export default function AdvancedSettings({
+  customFormat,
+  setCustomFormat,
+  additionalInstructions,
+  setAdditionalInstructions
+}: AdvancedSettingsProps) {
   const [isExpanded, setIsExpanded] = useState(false)
   const defaultFormat = `You are a professional translator, please translate the text given to you following the below instructions. Do not use quotations or say anything else aside from the translation in your response.
 Language: {{language}}
@@ -35,7 +46,8 @@ Additional instructions:
           <div>
             <label className="block text-sm font-medium mb-1">Custom Instruction Format</label>
             <Textarea
-              defaultValue={defaultFormat}
+              value={customFormat || defaultFormat}
+              onChange={(e) => setCustomFormat(e.target.value)}
               placeholder="Enter custom format (use {{language}} and {{tone}} placeholders)"
               className="mt-1"
               rows={6}
@@ -44,6 +56,8 @@ Additional instructions:
           <div>
             <label className="block text-sm font-medium mb-1">Additional Instructions</label>
             <Textarea
+              value={additionalInstructions}
+              onChange={(e) => setAdditionalInstructions(e.target.value)}
               placeholder="Enter any additional translation requirements"
               className="mt-1"
               rows={4}
