@@ -17,7 +17,7 @@ const Footer = () =>
           rel="noopener noreferrer"
           className="link-underline hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
         >
-          Kakusui LLC
+          Tetra Group LLC DBA Kakusui LLC
         </Link> © Copyright 2024</span>
         <div className="flex flex-wrap justify-center items-center gap-4 px-4">
           <Link 
