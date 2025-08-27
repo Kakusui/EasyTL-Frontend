@@ -18,7 +18,7 @@ const Footer = () =>
           className="link-underline hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
         >
           Tetra Group LLC DBA Kakusui LLC
-        </Link> © Copyright 2024</span>
+        </Link> © Copyright 2024-{new Date().getFullYear()}</span>
         <div className="flex flex-wrap justify-center items-center gap-4 px-4">
           <Link 
             to="/terms"
