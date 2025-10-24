@@ -38,6 +38,14 @@ const Footer = () =>
           >
             Privacy Policy
           </Link>
+          <a
+            href="https://status.easytl.org"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="link-underline hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
+          >
+            Status
+          </a>
         </div>
       </div>
     </footer>
