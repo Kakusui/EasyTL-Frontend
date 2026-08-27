@@ -22,7 +22,9 @@ import { useAuth } from '@/contexts/AuthContext'
 import { LoginDialog } from './LoginDialog'
 import { useToast } from '@/hooks/use-toast'
 import { getURL } from '@/utils'
+import { requiresTurnstile, TURNSTILE_SITE_KEY } from '@/utils/turnstile'
 import Cookies from 'js-cookie'
+import Turnstile from './Turnstile'
 
 interface ResponseValues {
   translatedText: string;
@@ -39,7 +41,7 @@ export default function TranslationInterface() {
   const { isLoggedIn, credits, updateCredits } = useAuth()
   const { theme, setTheme } = useTheme()
   const [showOutput, setShowOutput] = useState(false)
-  const [_, setResponse] = useState<ResponseValues | null>(null)
+  const [, setResponse] = useState<ResponseValues | null>(null)
   const toast = useToast()
   const access_token = localStorage.getItem('access_token')
   const [selectedLLM, setSelectedLLM] = useState('')
@@ -51,6 +53,8 @@ export default function TranslationInterface() {
   const [tone, setTone] = useState('Formal; Polite')
   const [customFormat, setCustomFormat] = useState('')
   const [additionalInstructions, setAdditionalInstructions] = useState('')
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null)
+  const [resetTurnstile, setResetTurnstile] = useState(0)
 
   // Load saved preferences on component mount
   useEffect(() => {
@@ -166,6 +170,15 @@ Additional instructions:
       return
     }
 
+    if (requiresTurnstile() && !turnstileToken) {
+      toast.toast({
+        title: "Verification Required",
+        description: "Please complete the verification",
+        variant: "destructive"
+      })
+      return
+    }
+
     if (useCredits) {
       try {
         const costResponse = await fetch(getURL("/proxy/calculate-token-cost"),
@@ -197,7 +210,7 @@ Additional instructions:
           return
         }
       }
-      catch (error) {
+      catch {
         toast.toast({
           title: "Error",
           description: "Failed to calculate translation cost",
@@ -221,7 +234,8 @@ Additional instructions:
         llmType: selectedLLM.toLowerCase(),
         userAPIKey: useCredits ? "" : apiKey,
         model: selectedModel,
-        using_credits: useCredits
+        using_credits: useCredits,
+        turnstile_token: turnstileToken
       }
 
       const response = await fetch(getURL("/proxy/easytl/stream"),
@@ -298,6 +312,8 @@ Additional instructions:
     finally {
       setIsLoading(false)
       setIsStreaming(false)
+      setTurnstileToken(null)
+      setResetTurnstile((current) => current + 1)
     }
   }
 
@@ -396,6 +412,18 @@ Additional instructions:
               onClick={handleSubmit}
               isLoading={isLoading}
             />
+            {requiresTurnstile() && (
+              <div className="flex justify-center">
+                <Turnstile
+                  siteKey={TURNSTILE_SITE_KEY}
+                  action="easytl_stream"
+                  onVerify={setTurnstileToken}
+                  onExpire={() => setTurnstileToken(null)}
+                  onError={() => setTurnstileToken(null)}
+                  resetKey={resetTurnstile}
+                />
+              </div>
+            )}
           </div>
         </div>
 
@@ -420,4 +448,3 @@ Additional instructions:
     </div>
   )
 }
-

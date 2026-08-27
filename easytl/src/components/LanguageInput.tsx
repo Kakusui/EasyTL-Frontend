@@ -11,8 +11,10 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { getURL } from '@/utils'
+import { requiresTurnstile, TURNSTILE_SITE_KEY } from '@/utils/turnstile'
 import { useAuth } from '@/contexts/AuthContext'
 import { useToast } from '@/hooks/use-toast'
+import Turnstile from './Turnstile'
 
 interface LanguageInputProps 
 {
@@ -37,6 +39,8 @@ export default function LanguageInput({
 {
   const [isDetecting, setIsDetecting] = useState(false)
   const [customLanguage, setCustomLanguage] = useState('')
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null)
+  const [resetTurnstile, setResetTurnstile] = useState(0)
   const toast = useToast()
   const { isLoggedIn } = useAuth()
   const access_token = localStorage.getItem('access_token')
@@ -74,6 +78,16 @@ export default function LanguageInput({
       return
     }
 
+    if(requiresTurnstile() && !turnstileToken)
+    {
+      toast.toast({
+        title: "Verification Required",
+        description: "Please complete the verification",
+        variant: "destructive"
+      })
+      return
+    }
+
     setIsDetecting(true)
 
     try 
@@ -91,7 +105,8 @@ export default function LanguageInput({
           llmType: selectedLLM.toLowerCase(),
           userAPIKey: useCredits ? "" : apiKey,
           model: selectedModel,
-          using_credits: useCredits
+          using_credits: useCredits,
+          turnstile_token: turnstileToken
         }),
       })
 
@@ -115,6 +130,8 @@ export default function LanguageInput({
     finally 
     {
       setIsDetecting(false)
+      setTurnstileToken(null)
+      setResetTurnstile((current) => current + 1)
     }
   }
 
@@ -234,6 +251,18 @@ export default function LanguageInput({
           {isDetecting ? 'Detecting...' : 'Detect'}
         </Button>
       </div>
+      {requiresTurnstile() && (
+        <div className="flex justify-center">
+          <Turnstile
+            siteKey={TURNSTILE_SITE_KEY}
+            action="easytl_detect"
+            onVerify={setTurnstileToken}
+            onExpire={() => setTurnstileToken(null)}
+            onError={() => setTurnstileToken(null)}
+            resetKey={resetTurnstile}
+          />
+        </div>
+      )}
       <Input
         type="text"
         placeholder="Or type a language"
