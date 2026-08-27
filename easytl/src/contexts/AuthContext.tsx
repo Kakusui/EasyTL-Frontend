@@ -38,8 +38,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         {
             try 
             {
-                const payload = JSON.parse(atob(token.split('.')[1]));
-                return payload.exp * 1000 > Date.now();
+                const encodedPayload = token.split('.')[1];
+                if(!encodedPayload) return false;
+
+                const normalizedPayload = encodedPayload.replace(/-/g, '+').replace(/_/g, '/');
+                const paddedPayload = normalizedPayload.padEnd(
+                    normalizedPayload.length + (4 - normalizedPayload.length % 4) % 4,
+                    '='
+                );
+                const payload = JSON.parse(atob(paddedPayload));
+                return typeof payload.exp === 'number' && payload.exp * 1000 > Date.now();
             } 
             catch (error) 
             {
@@ -50,27 +58,75 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return false;
     };
 
+    const clearAuthState = (): void =>
+    {
+        setIsLoggedIn(false);
+        setUserEmail(null);
+        setIsPrivilegedUser(false);
+        setCredits(0);
+        lastFullCheckRef.current = 0;
+    };
+
+    const refreshAccessToken = async (): Promise<boolean> =>
+    {
+        try
+        {
+            const response = await fetch(getURL('/auth/refresh-access-token'),
+            {
+                method: 'POST',
+                credentials: 'include',
+            });
+
+            if(!response.ok) return false;
+
+            const data = await response.json();
+            if(typeof data.access_token !== 'string' || !data.access_token) return false;
+
+            localStorage.setItem('access_token', data.access_token);
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
+    };
+
     const performFullCheck = async (): Promise<void> =>
     {
-        if(!checkTokenExpiration()) 
+        let accessToken = localStorage.getItem('access_token');
+        if(!accessToken || !checkTokenExpiration())
         {
-            setIsLoggedIn(false);
-            setUserEmail(null);
-            setIsPrivilegedUser(false);
-            setCredits(0);
+            if(!await refreshAccessToken())
+            {
+                clearAuthState();
+                return;
+            }
+            accessToken = localStorage.getItem('access_token');
+        }
+
+        if(!accessToken)
+        {
+            clearAuthState();
             return;
         }
 
-        const access_token = localStorage.getItem('access_token');
         try 
         {
-            const response = await fetch(getURL('/user/info'), 
+            const getUserInfo = (token: string) => fetch(getURL('/user/info'),
             {
                 headers: 
                 {
-                    'Authorization': `Bearer ${access_token}`,
-                }
+                    'Authorization': `Bearer ${token}`,
+                },
+                credentials: 'include',
             });
+
+            let response = await getUserInfo(accessToken);
+            if(response.status === 401 && await refreshAccessToken())
+            {
+                accessToken = localStorage.getItem('access_token');
+                if(accessToken) response = await getUserInfo(accessToken);
+            }
 
             if(response.ok) 
             {
@@ -89,7 +145,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         catch (error) 
         {
             console.error('Error fetching user info:', error);
-            logout();
+            clearAuthState();
         }
     };
 
@@ -133,12 +189,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     const logout = (): void =>
     {
+        void fetch(getURL('/auth/logout'),
+        {
+            method: 'POST',
+            credentials: 'include',
+        }).catch(() => undefined);
         localStorage.removeItem('access_token');
-        setIsLoggedIn(false);
-        setUserEmail(null);
-        setIsPrivilegedUser(false);
-        setCredits(0);
-        lastFullCheckRef.current = 0;
+        clearAuthState();
     };
 
     const updateCredits = (newCredits: number): void =>
@@ -171,4 +228,4 @@ export const useAuth = () =>
         throw new Error('useAuth must be used within an AuthProvider');
     }
     return context;
-}; 
+};
